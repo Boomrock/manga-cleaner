@@ -1,0 +1,7 @@
+requests==2.32.3
+torch==2.7.0+cu118
+torchvision==0.22.0+cu118
+Pillow==11.2.1
+segmentation_models_pytorch==0.5.0
+simple-lama-inpainting==0.1.2
+matplotlib==3.10.3  # если используешь для отладки/вывода изображений
