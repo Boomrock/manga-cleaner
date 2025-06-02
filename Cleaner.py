@@ -1,14 +1,14 @@
 import PIL
 import PIL.Image
 from simple_lama_inpainting import SimpleLama
-from Postprocessor import Postprocessor
-from Preprocessor import Preprocessor
-from ModelLoader import ModelLoader
-from DetectorType import DetectorType
+from Cleaner.Preprocessor import Preprocessor
+from Cleaner.Postprocessor import Postprocessor
+from Cleaner.ModelLoader import ModelLoader
+from Cleaner.DetectorType import DetectorType
 import torch
 import torch.nn as nn
 from PIL import Image
-from typing import  Tuple
+from typing import  Tuple, Union
 import segmentation_models_pytorch as smp
 import matplotlib.pyplot as plt
 
@@ -19,9 +19,11 @@ class Cleaner:
     _preprocessor: Preprocessor
     _postprocessor: Postprocessor
 
-    def __init__(self, detector_type: DetectorType = DetectorType.UNetPlusPlus):
+    def __init__(self, detector_type: DetectorType = DetectorType.UNet):
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._detector, self._preprocessor, self._postprocessor = self.__initDetector(detector_type)
+        self._detector = self._detector.to(self._device)
+
         self._cleaner = SimpleLama(self._device) # type: ignore
 
     @staticmethod 
@@ -62,9 +64,10 @@ class Cleaner:
         loader.load(model, type, self._device.type)
         return model, preprocessor, postprocessor
 
-    def clean(self, image) -> PIL.Image.Image:
-        if image is str:
-            image = Image.open(image).convert("RGB") # type: ignore
+    def clean(self, image: Union[str, Image.Image]) -> Image.Image:
+        # Если передан путь — открыть изображение
+        if isinstance(image, str):
+            image = Image.open(image).convert("RGB")
 
         # 2. Обработка через segment_model (на полном изображении)
         mask = self.detect(image)# [H, W]
@@ -73,13 +76,7 @@ class Cleaner:
         return result
     
     def detect(self, image: PIL.Image.Image) -> PIL.Image.Image:
-        tensor = self._preprocessor(image)
+        tensor = self._preprocessor(image).to(self._device)
         predicted_mask = self._detector(tensor)
         preprocessed_image = self._postprocessor(predicted_mask, self._device)
         return preprocessed_image
-
-        
-
-
-
-

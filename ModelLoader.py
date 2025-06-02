@@ -1,23 +1,16 @@
 import torch
 from torch import nn
 
-from DetectorType import DetectorType
+from Cleaner.DetectorType import DetectorType
 
 
-_github = "https://github.com/Boomrock/Cleaner/"
+_github = "https://github.com/Boomrock/manga-cleaner/releases/download/weights/"
 
 class ModelLoader: 
     repo: str = _github
-    default_path: str = "./models"
-
-
     def load(self, model: nn.Module, model_type: DetectorType, map_location='cpu'):
         model_name = self._get_path(model_type)
-
-
         path = self.repo + model_name
-        
-        
         self._load_from_github(model, path, map_location)
         
 
@@ -32,14 +25,13 @@ class ModelLoader:
         """
         state_dict = torch.hub.load_state_dict_from_url(github_url, map_location)
         model.load_state_dict(state_dict)
-        
         return model
     
 
     @staticmethod
-    def _get_path(model_path: DetectorType) -> str:
-        if DetectorType.UNet:
-            return "Unet.pth"
-        elif DetectorType.UNetPlusPlus:
-            return "UnetPlusPlus.pth"
+    def _get_path(type: DetectorType) -> str:
+        if type == DetectorType.UNet:
+            return "Unet.pt"
+        elif type == DetectorType.UNetPlusPlus:
+            return "Unet++.pt"
         raise ValueError("Неизвестная модель")
