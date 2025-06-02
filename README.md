@@ -39,7 +39,7 @@ cleaned_image.save("cleaned_image.jpg")
 ## Modules
 
 - `Cleaner`: Main class for cleaning text from manga images.
-- `Preprocessor / Postprocessor`: Handle image preprocessing and mask postprocessing.
+- `Preprocessor / Postprocessor`: Handle mask preprocessing and postprocessing.
 - `ModelLoader`: Loads trained weights for the detector model.
 - `DetectorType`: Enum to choose between U-Net and U-Net++.
 
